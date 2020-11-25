@@ -2,7 +2,7 @@ const fs = require('fs');
 const { argv } = require('yargs');
 const nodemailer = require('nodemailer');
 
-const petIdsJsonPath = './pet-ids.json';
+const petIdsJsonPath = `./pet-ids.json`;
 
 function getPetIds() {
   try {
@@ -19,7 +19,7 @@ function savePetIds(ids) {
 }
 
 function saveCache(ids) {
-  fs.writeFileSync(`napaluchu_new-pet-ids_${argv.date}`, JSON.stringify({ ids }));
+  fs.writeFileSync(`${argv.dataPath}new-pet-ids.json`, JSON.stringify({ ids }));
 }
 
 function getNewPetIdsFromArgs() {
