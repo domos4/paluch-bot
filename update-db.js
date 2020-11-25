@@ -23,7 +23,7 @@ function saveCache(ids) {
 }
 
 function getNewPetIdsFromArgs() {
-  const currentPetIds = await getPetIds();
+  const currentPetIds = getPetIds();
   const newPetIds = [];
   argv._
     .map((petId) => petId.toString())
