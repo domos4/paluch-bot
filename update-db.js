@@ -24,7 +24,7 @@ function saveCache(ids) {
 
 function getNewPetIdsFromArgs() {
   const currentPetIds = await getPetIds();
-  const newPetIds: Array<string> = [];
+  const newPetIds = [];
   argv._
     .map((petId) => petId.toString())
     .forEach((petId) => {
@@ -47,7 +47,7 @@ function getNotificationHtml(petIds) {
   `;
 }
 
-function notifyAboutPets(petId: string): Promise<void> {
+async function notifyAboutPets(petId) {
   const transporter = nodemailer.createTransport({
     host: 'smtp.elasticemail.com',
     port: 2525,
@@ -72,9 +72,9 @@ function notifyAboutPets(petId: string): Promise<void> {
   }
 }
 
-async function appendNewPetsToDbAndNotify(): Promise<void> {
-  const currentPetIds = await getPetIds();
-  const newPetIds = await getNewPetIdsFromArgs();
+async function appendNewPetsToDbAndNotify() {
+  const currentPetIds = getPetIds();
+  const newPetIds = getNewPetIdsFromArgs();
   saveCache(newPetIds);
   try {
     // await notifyAboutPets(newPetIds);
