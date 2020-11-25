@@ -42,21 +42,38 @@ function getLinkToPet(petId) {
 function getNotificationHtml(petIds) {
   return `
     <div>
-        ${petIds.map(getLinkToPet)}<br/>
+        ${petIds.map((petId) => `${getLinkToPet(petId)}<br/>`)}
     </div>
   `;
 }
 
-async function notifyAboutPets(petId) {
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.elasticemail.com',
-    port: 2525,
-    secure: false,
+async function notifyAboutPets(petIds) {
+  if (petIds.length === 0) {
+    return;
+  }
+
+  let testAccount = await nodemailer.createTestAccount();
+
+  // create reusable transporter object using the default SMTP transport
+  let transporter = nodemailer.createTransport({
+    host: 'smtp.ethereal.email',
+    port: 587,
+    secure: false, // true for 465, false for other ports
     auth: {
-      user: 'd.chmielarz@gmail.com',
-      pass: '093E5DB527FCC39B66003E5E5ADEB4A2A00A',
+      user: testAccount.user, // generated ethereal user
+      pass: testAccount.pass, // generated ethereal password
     },
   });
+
+  // const transporter = nodemailer.createTransport({
+  //   host: 'smtp.elasticemail.com',
+  //   port: 2525,
+  //   secure: false,
+  //   auth: {
+  //     user: 'd.chmielarz@gmail.com',
+  //     pass: '093E5DB527FCC39B66003E5E5ADEB4A2A00A',
+  //   },
+  // });
 
   try {
     const info = await transporter.sendMail({
@@ -66,6 +83,7 @@ async function notifyAboutPets(petId) {
       text: 'https://napaluchu.waw.pl/pet/011903263/',
       html: getNotificationHtml(petIds),
     });
+    console.log(getNotificationHtml(petIds))
     console.log(info);
   } catch (error) {
     console.error(error);
@@ -77,11 +95,11 @@ async function appendNewPetsToDbAndNotify() {
   const newPetIds = getNewPetIdsFromArgs();
   saveCache(newPetIds);
   try {
-    // await notifyAboutPets(newPetIds);
+    await notifyAboutPets(newPetIds);
     savePetIds([...currentPetIds, ...newPetIds]);
   } catch (error) {
     console.error(error);
   }
 }
 
-appendNewPetsToDbAndNotify();
+// appendNewPetsToDbAndNotify();
