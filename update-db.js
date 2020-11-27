@@ -30,7 +30,7 @@ function getNewPetIds(petIds, petIdsPath) {
   return newPetIds;
 }
 
-async function appendNewPetsToDb(petIds, newPetIdsCachePath, petIdsPath) {
+function appendNewPetsToDb(petIds, newPetIdsCachePath, petIdsPath) {
   const currentPetIds = getPetIds(petIdsPath);
   const newPetIds = getNewPetIds(petIds, petIdsPath);
   saveCache(newPetIds, newPetIdsCachePath);
