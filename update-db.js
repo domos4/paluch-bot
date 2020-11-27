@@ -14,7 +14,9 @@ function savePetIds(ids, petIdsPath) {
 }
 
 function saveCache(ids, path) {
-  fs.writeFileSync(path, JSON.stringify({ ids }));
+  if (path) {
+    fs.writeFileSync(path, JSON.stringify({ ids }));
+  }
 }
 
 function getNewPetIds(petIds, petIdsPath) {
@@ -30,7 +32,7 @@ function getNewPetIds(petIds, petIdsPath) {
   return newPetIds;
 }
 
-function appendNewPetsToDb(petIds, newPetIdsCachePath, petIdsPath) {
+function appendNewPetsToDb(petIds, petIdsPath, newPetIdsCachePath) {
   const currentPetIds = getPetIds(petIdsPath);
   const newPetIds = getNewPetIds(petIds, petIdsPath);
   saveCache(newPetIds, newPetIdsCachePath);

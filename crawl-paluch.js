@@ -20,9 +20,9 @@ async function fetchData(url, id) {
     console.log(saveIdsToDbCmd);
     execSync(saveIdsToDbCmd);
     const db = fs.readFileSync(dbFileName).toString().split("\n");
-    updateMasterDb(db.slice(0, db.length - 1), `${dataPath}/new-pet-ids.json`, `${dataParentPath}/pet-ids.json`);
+    updateMasterDb(db.slice(0, db.length - 1), `${dataParentPath}/pet-ids.json`, `${dataPath}/new-pet-ids.json`);
   }
-
+  // updateMasterDb(db.slice(0, db.length - 1), `${dataPath}/new-pet-ids.json`);
 }
 
 async function crawl() {
