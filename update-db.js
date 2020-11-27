@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { argv } = require('yargs');
 const nodemailer = require('nodemailer');
 
 const petIdsJsonPath = `./pet-ids.json`;
@@ -18,14 +17,14 @@ function savePetIds(ids) {
   fs.writeFileSync(petIdsJsonPath, JSON.stringify({ ids }));
 }
 
-function saveCache(ids) {
-  fs.writeFileSync(`${argv.dataPath}new-pet-ids.json`, JSON.stringify({ ids }));
+function saveCache(ids, path) {
+  fs.writeFileSync(path, JSON.stringify({ ids }));
 }
 
-function getNewPetIdsFromArgs() {
+function getNewPetIdsFromArgs(petIds) {
   const currentPetIds = getPetIds();
   const newPetIds = [];
-  argv._
+  petIds
     .map((petId) => petId.toString())
     .forEach((petId) => {
       if (!currentPetIds.includes(petId)) {
@@ -83,17 +82,17 @@ async function notifyAboutPets(petIds) {
       text: 'https://napaluchu.waw.pl/pet/011903263/',
       html: getNotificationHtml(petIds),
     });
-    console.log(getNotificationHtml(petIds))
+    console.log(getNotificationHtml(petIds));
     console.log(info);
   } catch (error) {
     console.error(error);
   }
 }
 
-async function appendNewPetsToDbAndNotify() {
+async function appendNewPetsToDbAndNotify(petIds, newPetIdsCachePath) {
   const currentPetIds = getPetIds();
-  const newPetIds = getNewPetIdsFromArgs();
-  saveCache(newPetIds);
+  const newPetIds = getNewPetIdsFromArgs(petIds);
+  saveCache(newPetIds, newPetIdsCachePath);
   try {
     await notifyAboutPets(newPetIds);
     savePetIds([...currentPetIds, ...newPetIds]);
@@ -102,4 +101,4 @@ async function appendNewPetsToDbAndNotify() {
   }
 }
 
-// appendNewPetsToDbAndNotify();
+module.exports = appendNewPetsToDbAndNotify;
