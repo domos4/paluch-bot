@@ -11,24 +11,26 @@ try {
   //ignore
 }
 execSync(`mkdir ${dataPath}`);
+invoke();
 
-function fetchData(url, id) {
+async function fetchData(url, id) {
   const numberOfPages = 10;
   for (let pageIndex = 1; pageIndex <= numberOfPages; pageIndex++) {
     const htmlFileName = `${dataPath}/index_${id}_${pageIndex}.html`;
     const dbFileName = `${dataPath}/db_${id}_${pageIndex}`;
-    const fetchHtmlCmd = `wget -O "${htmlFileName}" ${url}&pet_page=${pageIndex}`;
+    const fetchHtmlCmd = `wget -O "${htmlFileName}" "${url}&pet_page=${pageIndex}"`;
     console.log(fetchHtmlCmd);
     execSync(fetchHtmlCmd);
     const saveIdsToDbCmd = `cat "${htmlFileName}" | grep -Eo '<a href="/pet/(\\d+)/">dowiedz' | grep -Eo '\\d+' | tee "${dbFileName}"`;
     console.log(saveIdsToDbCmd);
     execSync(saveIdsToDbCmd);
     const db = fs.readFileSync(dbFileName).toString().split("\n");
-    updateMasterDb(db.slice(0, db.length - 1), `${dataPath}/new-pet-ids_${id}_${pageIndex}.json`);
+    await updateMasterDb(db.slice(0, db.length - 1), `${dataPath}/new-pet-ids_${id}_${pageIndex}.json`);
   }
 }
 
-const url = 'https://napaluchu.waw.pl/zwierzeta/zwierzeta-do-adopcji/';
-
-fetchData(url + '?pet_species=1&pet_weight=2&pet_age=1', '1');
-fetchData(url + '?pet_species=1&pet_weight=2&pet_age=2', '2');
+async function invoke() {
+  const url = 'https://napaluchu.waw.pl/zwierzeta/zwierzeta-do-adopcji/';
+  await fetchData(url + '?pet_species=1&pet_weight=2&pet_age=1', '1');
+  await fetchData(url + '?pet_species=1&pet_weight=2&pet_age=2', '2');
+}
