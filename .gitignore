@@ -5,4 +5,5 @@
 *.iml
 
 data
+logs
 node_modules
