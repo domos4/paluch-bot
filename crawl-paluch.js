@@ -24,7 +24,6 @@ function fetchData(url, id) {
     execSync(saveIdsToDbCmd);
     extractNewPetIds(transformDbToPetIdsArray(dbFileName), batchPetIdsJsonPath, `${dataPath}/new-pet-ids.json`);
   }
-
 }
 
 async function crawl() {
@@ -34,7 +33,6 @@ async function crawl() {
   const newPetIds = extractNewPetIds(parsePetIdsJson(batchPetIdsJsonPath), `./pet-ids.json`);
   await notifyAboutPets(newPetIds);
 }
-
 
 execSync(`mkdir -p ${dataParentPath}`);
 crawl();
