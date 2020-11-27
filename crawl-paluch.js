@@ -1,9 +1,11 @@
-const fs = require('fs');
 const { execSync } = require('child_process');
-const updateMasterDb = require('./update-db');
+const extractNewPetIds = require('./extract-new-pet-ids');
+const transformDbToPetIdsArray = require('./transform-db-to-pet-ids-array');
+const parsePetIdsJson = require('./parse-pet-ids-json');
 
 const time = new Date().getTime();
 const dataParentPath = `./data/${time}`;
+const batchPetIdsJsonPath = `${dataParentPath}/pet-ids.json`;
 
 async function fetchData(url, id) {
   const numberOfPages = 10;
@@ -19,10 +21,9 @@ async function fetchData(url, id) {
     const saveIdsToDbCmd = `cat "${htmlFileName}" | grep -Eo '<a href="/pet/(\\d+)/">dowiedz' | grep -Eo '\\d+' | tee "${dbFileName}"`;
     console.log(saveIdsToDbCmd);
     execSync(saveIdsToDbCmd);
-    const db = fs.readFileSync(dbFileName).toString().split("\n");
-    updateMasterDb(db.slice(0, db.length - 1), `${dataParentPath}/pet-ids.json`, `${dataPath}/new-pet-ids.json`);
+    extractNewPetIds(transformDbToPetIdsArray(dbFileName), batchPetIdsJsonPath, `${dataPath}/new-pet-ids.json`);
   }
-  // updateMasterDb(db.slice(0, db.length - 1), `${dataPath}/new-pet-ids.json`);
+  extractNewPetIds(parsePetIdsJson(batchPetIdsJsonPath), `./pet-ids.json`);
 }
 
 async function crawl() {
