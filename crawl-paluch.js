@@ -22,7 +22,8 @@ function fetchData(url, id) {
     const saveIdsToDbCmd = `cat "${htmlFileName}" | grep -Eo '<a href="/pet/(\\d+)/">dowiedz' | grep -Eo '\\d+' | tee "${dbFileName}"`;
     console.log(saveIdsToDbCmd);
     execSync(saveIdsToDbCmd);
-    extractNewPetIds(transformDbToPetIdsArray(dbFileName), batchPetIdsJsonPath, `${dataPath}/new-pet-ids.json`);
+    const newPetIds = extractNewPetIds(transformDbToPetIdsArray(dbFileName), batchPetIdsJsonPath, `${dataPath}/new-pet-ids.json`);
+    console.log('partial new pet ids', newPetIds);
   }
 }
 
@@ -31,6 +32,7 @@ async function crawl() {
   fetchData(url + '?pet_species=1&pet_weight=2&pet_age=1', 'query1');
   fetchData(url + '?pet_species=1&pet_weight=2&pet_age=2', 'query2');
   const newPetIds = extractNewPetIds(parsePetIdsJson(batchPetIdsJsonPath), `./pet-ids.json`);
+  console.log('all new pet ids', newPetIds);
   await notifyAboutPets(newPetIds);
   execSync('rm -rf data');
 }
