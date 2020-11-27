@@ -2,7 +2,7 @@
   "name": "paluch-crawler",
   "version": "1.0.0",
   "description": "",
-  "main": "extract-new-pet-ids.js",
+  "main": "crawl-paluch.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
