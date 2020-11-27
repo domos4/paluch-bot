@@ -22,6 +22,7 @@ function extractNewPetIds(inputPetIds, masterPetIdsJsonPath, newPetIdsCacheJsonP
   const newPetIds = getNewPetIds(inputPetIds, currentPetIds);
   writePetIdsToJson(newPetIds, newPetIdsCacheJsonPath);
   writePetIdsToJson([...currentPetIds, ...newPetIds], masterPetIdsJsonPath);
+  return newPetIds;
 }
 
 module.exports = extractNewPetIds;

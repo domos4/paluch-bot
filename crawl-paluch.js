@@ -2,6 +2,7 @@ const { execSync } = require('child_process');
 const extractNewPetIds = require('./extract-new-pet-ids');
 const transformDbToPetIdsArray = require('./transform-db-to-pet-ids-array');
 const parsePetIdsJson = require('./parse-pet-ids-json');
+const notifyAboutPets = require('./notify-about-pets');
 
 const time = new Date().getTime();
 const dataParentPath = `./data/${time}`;
@@ -23,7 +24,8 @@ async function fetchData(url, id) {
     execSync(saveIdsToDbCmd);
     extractNewPetIds(transformDbToPetIdsArray(dbFileName), batchPetIdsJsonPath, `${dataPath}/new-pet-ids.json`);
   }
-  extractNewPetIds(parsePetIdsJson(batchPetIdsJsonPath), `./pet-ids.json`);
+  const newPetIds = extractNewPetIds(parsePetIdsJson(batchPetIdsJsonPath), `./pet-ids.json`);
+  // await notifyAboutPets(newPetIds);
 }
 
 async function crawl() {
