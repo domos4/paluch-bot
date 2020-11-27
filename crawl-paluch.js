@@ -5,9 +5,6 @@ const updateMasterDb = require('./update-db');
 const time = new Date().getTime();
 const dataParentPath = `./data/${time}`;
 
-execSync(`mkdir -p ${dataParentPath}`);
-invoke();
-
 async function fetchData(url, id) {
   const numberOfPages = 10;
   for (let pageIndex = 1; pageIndex <= numberOfPages; pageIndex++) {
@@ -23,12 +20,17 @@ async function fetchData(url, id) {
     console.log(saveIdsToDbCmd);
     execSync(saveIdsToDbCmd);
     const db = fs.readFileSync(dbFileName).toString().split("\n");
-    await updateMasterDb(db.slice(0, db.length - 1), `${dataPath}/new-pet-ids.json`);
+    await updateMasterDb(db.slice(0, db.length - 1), `${dataPath}/new-pet-ids.json`, `${dataParentPath}/pet-ids.json`);
   }
+
 }
 
-async function invoke() {
+async function crawl() {
   const url = 'https://napaluchu.waw.pl/zwierzeta/zwierzeta-do-adopcji/';
   await fetchData(url + '?pet_species=1&pet_weight=2&pet_age=1', 'query1');
   await fetchData(url + '?pet_species=1&pet_weight=2&pet_age=2', 'query2');
 }
+
+
+execSync(`mkdir -p ${dataParentPath}`);
+crawl();

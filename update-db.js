@@ -1,28 +1,24 @@
 const fs = require('fs');
-const nodemailer = require('nodemailer');
 
-const petIdsJsonPath = `./pet-ids.json`;
-
-function getPetIds() {
+function getPetIds(petIdsPath) {
   try {
-    const petIdsJson = fs.readFileSync(petIdsJsonPath);
+    const petIdsJson = fs.readFileSync(petIdsPath);
     return JSON.parse(petIdsJson).ids || [];
   } catch (error) {
-    console.error(error);
     return [];
   }
 }
 
-function savePetIds(ids) {
-  fs.writeFileSync(petIdsJsonPath, JSON.stringify({ ids }));
+function savePetIds(ids, petIdsPath) {
+  fs.writeFileSync(petIdsPath, JSON.stringify({ ids }));
 }
 
 function saveCache(ids, path) {
   fs.writeFileSync(path, JSON.stringify({ ids }));
 }
 
-function getNewPetIdsFromArgs(petIds) {
-  const currentPetIds = getPetIds();
+function getNewPetIds(petIds, petIdsPath) {
+  const currentPetIds = getPetIds(petIdsPath);
   const newPetIds = [];
   petIds
     .map((petId) => petId.toString())
@@ -34,71 +30,11 @@ function getNewPetIdsFromArgs(petIds) {
   return newPetIds;
 }
 
-function getLinkToPet(petId) {
-  return `<a href="https://napaluchu.waw.pl/pet/${petId}/">Link do pieska nr ${petId}</a>`;
-}
-
-function getNotificationHtml(petIds) {
-  return `
-    <div>
-        ${petIds.map((petId) => `${getLinkToPet(petId)}<br/>`)}
-    </div>
-  `;
-}
-
-async function notifyAboutPets(petIds) {
-  if (petIds.length === 0) {
-    return;
-  }
-
-  let testAccount = await nodemailer.createTestAccount();
-
-  // create reusable transporter object using the default SMTP transport
-  let transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: testAccount.user, // generated ethereal user
-      pass: testAccount.pass, // generated ethereal password
-    },
-  });
-
-  // const transporter = nodemailer.createTransport({
-  //   host: 'smtp.elasticemail.com',
-  //   port: 2525,
-  //   secure: false,
-  //   auth: {
-  //     user: 'd.chmielarz@gmail.com',
-  //     pass: '093E5DB527FCC39B66003E5E5ADEB4A2A00A',
-  //   },
-  // });
-
-  try {
-    const info = await transporter.sendMail({
-      from: '"Schornisko Paluch" <d.chmielarz@gmail.com>',
-      to: 'd.chmielarz@gmail.com',
-      subject: 'Nowy piesek na rejonie! 🐶',
-      text: 'https://napaluchu.waw.pl/pet/011903263/',
-      html: getNotificationHtml(petIds),
-    });
-    console.log(getNotificationHtml(petIds));
-    console.log(info);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-async function appendNewPetsToDbAndNotify(petIds, newPetIdsCachePath) {
-  const currentPetIds = getPetIds();
-  const newPetIds = getNewPetIdsFromArgs(petIds);
+async function appendNewPetsToDb(petIds, newPetIdsCachePath, petIdsPath) {
+  const currentPetIds = getPetIds(petIdsPath);
+  const newPetIds = getNewPetIds(petIds, petIdsPath);
   saveCache(newPetIds, newPetIdsCachePath);
-  try {
-    await notifyAboutPets(newPetIds);
-    savePetIds([...currentPetIds, ...newPetIds]);
-  } catch (error) {
-    console.error(error);
-  }
+  savePetIds([...currentPetIds, ...newPetIds], petIdsPath);
 }
 
-module.exports = appendNewPetsToDbAndNotify;
+module.exports = appendNewPetsToDb;
