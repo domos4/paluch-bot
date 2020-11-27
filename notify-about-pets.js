@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 
 const recipients = [
   'd.chmielarz@gmail.com',
-  'stachmielarz@gmail.com',
+  // 'stachmielarz@gmail.com',
 ];
 
 async function getMockTransporter() {
@@ -44,7 +44,7 @@ function getLinkToPet(petId) {
 function getNotificationHtml(petIds) {
   return `
     <div>
-        ${petIds.map((petId) => `${getLinkToPet(petId)}<br/>`)}
+        ${petIds.map((petId) => getLinkToPet(petId)).join('<br/>\n')}
     </div>
   `;
 }
@@ -56,7 +56,7 @@ async function notifyAboutPets(petIds) {
   try {
     const transporter = await getTransporter();
     const info = await transporter.sendMail({
-      from: '"Schornisko Paluch" <adopcje@napaluchu.waw.pl>',
+      from: '"Schornisko Paluch" <d.chmielarz@gmail.com>',
       to: recipients.join(', '),
       subject: 'Nowy piesek na rejonie! 🐶',
       html: getNotificationHtml(petIds),
