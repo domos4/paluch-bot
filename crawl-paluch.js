@@ -32,6 +32,7 @@ async function crawl() {
   fetchData(url + '?pet_species=1&pet_weight=2&pet_age=2', 'query2');
   const newPetIds = extractNewPetIds(parsePetIdsJson(batchPetIdsJsonPath), `./pet-ids.json`);
   await notifyAboutPets(newPetIds);
+  execSync('rm -rf data');
 }
 
 execSync(`mkdir -p ${dataParentPath}`);
