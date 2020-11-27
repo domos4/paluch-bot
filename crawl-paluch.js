@@ -8,7 +8,7 @@ const time = new Date().getTime();
 const dataParentPath = `./data/${time}`;
 const batchPetIdsJsonPath = `${dataParentPath}/pet-ids.json`;
 
-async function fetchData(url, id) {
+function fetchData(url, id) {
   const numberOfPages = 10;
   for (let pageIndex = 1; pageIndex <= numberOfPages; pageIndex++) {
     const pageDirName = `page${pageIndex}`;
@@ -24,14 +24,15 @@ async function fetchData(url, id) {
     execSync(saveIdsToDbCmd);
     extractNewPetIds(transformDbToPetIdsArray(dbFileName), batchPetIdsJsonPath, `${dataPath}/new-pet-ids.json`);
   }
-  const newPetIds = extractNewPetIds(parsePetIdsJson(batchPetIdsJsonPath), `./pet-ids.json`);
-  // await notifyAboutPets(newPetIds);
+
 }
 
 async function crawl() {
   const url = 'https://napaluchu.waw.pl/zwierzeta/zwierzeta-do-adopcji/';
-  await fetchData(url + '?pet_species=1&pet_weight=2&pet_age=1', 'query1');
-  await fetchData(url + '?pet_species=1&pet_weight=2&pet_age=2', 'query2');
+  fetchData(url + '?pet_species=1&pet_weight=2&pet_age=1', 'query1');
+  fetchData(url + '?pet_species=1&pet_weight=2&pet_age=2', 'query2');
+  const newPetIds = extractNewPetIds(parsePetIdsJson(batchPetIdsJsonPath), `./pet-ids.json`);
+  await notifyAboutPets(newPetIds);
 }
 
 
