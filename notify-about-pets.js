@@ -1,5 +1,10 @@
 const nodemailer = require('nodemailer');
 
+const recipients = [
+  'd.chmielarz@gmail.com',
+  'stachmielarz@gmail.com',
+];
+
 async function getMockTransporter() {
   const testAccount = await nodemailer.createTestAccount();
   return nodemailer.createTransport({
@@ -51,10 +56,9 @@ async function notifyAboutPets(petIds) {
   try {
     const transporter = await getTransporter();
     const info = await transporter.sendMail({
-      from: '"Schornisko Paluch" <d.chmielarz@gmail.com>',
-      to: 'd.chmielarz@gmail.com',
+      from: '"Schornisko Paluch" <adopcje@napaluchu.waw.pl>',
+      to: recipients.join(', '),
       subject: 'Nowy piesek na rejonie! 🐶',
-      text: 'https://napaluchu.waw.pl/pet/011903263/',
       html: getNotificationHtml(petIds),
     });
     console.log(getNotificationHtml(petIds));
