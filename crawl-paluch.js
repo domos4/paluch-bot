@@ -1,3 +1,4 @@
+const { argv } = require('yargs');
 const { execSync } = require('child_process');
 const extractNewPetIds = require('./extract-new-pet-ids');
 const transformDbToPetIdsArray = require('./transform-db-to-pet-ids-array');
@@ -27,6 +28,12 @@ function fetchData(url, id) {
   }
 }
 
+function maybeRemoveData() {
+  if (!argv["preserve-data"]) {
+    execSync('rm -rf data');
+  }
+}
+
 async function crawl() {
   const url = 'https://napaluchu.waw.pl/zwierzeta/zwierzeta-do-adopcji/';
   fetchData(url + '?pet_species=1&pet_weight=2&pet_age=1', 'query1');
@@ -34,7 +41,7 @@ async function crawl() {
   const newPetIds = extractNewPetIds(parsePetIdsJson(batchPetIdsJsonPath), `./pet-ids.json`);
   console.log('all new pet ids', newPetIds);
   await notifyAboutPets(newPetIds);
-  execSync('rm -rf data');
+  maybeRemoveData();
 }
 
 execSync(`mkdir -p ${dataParentPath}`);
