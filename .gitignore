@@ -7,8 +7,3 @@
 data
 logs
 node_modules
-
-# Twitter secrets
-twitter-api-key
-twitter-api-key-secret
-twitter-bearer-token
