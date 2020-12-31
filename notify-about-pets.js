@@ -1,51 +1,19 @@
-const nodemailer = require('nodemailer');
+const { execSync } = require('child_process');
+const twitterCopyDog = require('./twitter-copy-dog');
 
-const recipients = [
-  'd.chmielarz@gmail.com',
-  'stachmielarz@gmail.com',
-];
-
-async function getMockTransporter() {
-  const testAccount = await nodemailer.createTestAccount();
-  return nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: testAccount.user, // generated ethereal user
-      pass: testAccount.pass, // generated ethereal password
-    },
-  });
-}
-
-function getProductionTransporter() {
-  return nodemailer.createTransport({
-    host: 'smtp.elasticemail.com',
-    port: 2525,
-    secure: false,
-    auth: {
-      user: 'd.chmielarz@gmail.com',
-      pass: '093E5DB527FCC39B66003E5E5ADEB4A2A00A',
-    },
-  });
-}
-
-async function getTransporter() {
+function maybeTweet(notification) {
   if (process.env.NODE_ENV === 'production') {
-    return getProductionTransporter();
+    return execSync(`twurl -d 'status=${notification}' /1.1/statuses/update.json`);
   }
-  return getMockTransporter();
 }
 
 function getLinkToPet(petId) {
-  return `<a href="https://napaluchu.waw.pl/pet/${petId}/">Link do pieska nr ${petId}</a>`;
+  return `https://napaluchu.waw.pl/pet/${petId}/`;
 }
 
-function getNotificationHtml(petIds) {
+function getNotificationContent(petIds) {
   return `
-    <div>
-        ${petIds.map((petId) => getLinkToPet(petId)).join('<br/>\n')}
-    </div>
+    ${twitterCopyDog} ${petIds.map((petId) => getLinkToPet(petId)).join(' ')}
   `;
 }
 
@@ -53,16 +21,11 @@ async function notifyAboutPets(petIds) {
   if (petIds.length === 0) {
     return;
   }
+  const notification = getNotificationContent(petIds);
+  console.log('notifying with the following content:');
+  console.log(notification);
   try {
-    const transporter = await getTransporter();
-    const info = await transporter.sendMail({
-      from: '"Schronisko Paluch" <d.chmielarz@gmail.com>',
-      to: recipients.join(', '),
-      subject: 'Nowy piesek na rejonie! 🐶',
-      html: getNotificationHtml(petIds),
-    });
-    console.log(getNotificationHtml(petIds));
-    console.log(info);
+    maybeTweet(notification);
   } catch (error) {
     console.error(error);
   }

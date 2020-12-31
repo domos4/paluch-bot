@@ -1,9 +1,12 @@
-const { argv } = require('yargs');
 const { execSync } = require('child_process');
 const extractNewPetIds = require('./extract-new-pet-ids');
 const transformDbToPetIdsArray = require('./transform-db-to-pet-ids-array');
 const parsePetIdsJson = require('./parse-pet-ids-json');
 const notifyAboutPets = require('./notify-about-pets');
+
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
+const argv = yargs(hideBin(process.argv));
 
 const time = new Date().getTime();
 const dataParentPath = `./data/${time}`;
