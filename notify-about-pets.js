@@ -1,5 +1,7 @@
 const { execSync } = require('child_process');
-const twitterCopyDog = require('./twitter-copy-dog');
+const notificationCopyDog = require('./notification-copy-dog');
+const notificationCopyCat = require('./notification-copy-cat');
+const argv = require('./argv');
 
 function maybeTweet(notification) {
   if (process.env.NODE_ENV === 'production') {
@@ -12,8 +14,9 @@ function getLinkToPet(petId) {
 }
 
 function getNotificationContent(petIds) {
+  const copy = argv.pet === 'cat' ? notificationCopyCat : notificationCopyDog;
   return `
-    ${twitterCopyDog} ${petIds.map((petId) => getLinkToPet(petId)).join(' ')}
+    ${copy} ${petIds.map((petId) => getLinkToPet(petId)).join(' ')}
   `;
 }
 

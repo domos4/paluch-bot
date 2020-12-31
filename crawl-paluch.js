@@ -3,20 +3,27 @@ const extractNewPetIds = require('./extract-new-pet-ids');
 const transformDbToPetIdsArray = require('./transform-db-to-pet-ids-array');
 const parsePetIdsJson = require('./parse-pet-ids-json');
 const notifyAboutPets = require('./notify-about-pets');
-
-const yargs = require('yargs/yargs');
-const { hideBin } = require('yargs/helpers');
-const argv = yargs(hideBin(process.argv));
+const argv = require('./argv');
 
 const time = new Date().getTime();
 const dataParentPath = `./data/${time}`;
 const batchPetIdsJsonPath = `${dataParentPath}/pet-ids.json`;
 
-function fetchData(url, id) {
-  const numberOfPages = 10;
-  for (let pageIndex = 1; pageIndex <= numberOfPages; pageIndex++) {
+const petToPetBreedQueryParamMap = {
+  dog: '-1',
+  cat: '-2',
+};
+
+function getDataUrl() {
+  const baseUrl = 'https://napaluchu.waw.pl/zwierzeta/zwierzeta-do-adopcji/';
+  return baseUrl + `?pet_breed=${petToPetBreedQueryParamMap[argv.pet]}`;
+}
+
+function fetchDataAndWriteToBatchPetIdsJson() {
+  const url = getDataUrl();
+  for (let pageIndex = 1; pageIndex <= argv.pagesCount; pageIndex++) {
     const pageDirName = `page${pageIndex}`;
-    const dataPath = `${dataParentPath}/${id}/${pageDirName}`;
+    const dataPath = `${dataParentPath}/${pageDirName}`;
     execSync(`mkdir -p ${dataPath}`);
     const htmlFileName = `${dataPath}/index.html`;
     const dbFileName = `${dataPath}/db`;
@@ -31,20 +38,18 @@ function fetchData(url, id) {
   }
 }
 
-function maybeRemoveData() {
-  if (!argv["preserve-data"]) {
+function maybeRemoveTemporaryData() {
+  if (!argv.preserveData) {
     execSync('rm -rf data');
   }
 }
 
 async function crawl() {
-  const url = 'https://napaluchu.waw.pl/zwierzeta/zwierzeta-do-adopcji/';
-  fetchData(url + '?pet_species=1&pet_weight=2&pet_age=1', 'query1');
-  fetchData(url + '?pet_species=1&pet_weight=2&pet_age=2', 'query2');
+  fetchDataAndWriteToBatchPetIdsJson();
   const newPetIds = extractNewPetIds(parsePetIdsJson(batchPetIdsJsonPath), `./pet-ids.json`);
   console.log('all new pet ids', newPetIds);
   await notifyAboutPets(newPetIds);
-  maybeRemoveData();
+  maybeRemoveTemporaryData();
 }
 
 execSync(`mkdir -p ${dataParentPath}`);
