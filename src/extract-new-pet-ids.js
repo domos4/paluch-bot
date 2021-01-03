@@ -2,9 +2,7 @@ const fs = require('fs');
 const parsePetIdsJson = require('./parse-pet-ids-json');
 
 function writePetIdsToJson(ids, path) {
-  if (path) {
-    fs.writeFileSync(path, JSON.stringify({ ids }));
-  }
+  fs.writeFileSync(path, JSON.stringify({ ids }));
 }
 
 function getNewPetIds(inputPetIds, currentPetIds) {
@@ -17,10 +15,9 @@ function getNewPetIds(inputPetIds, currentPetIds) {
   return newPetIds;
 }
 
-function extractNewPetIds(inputPetIds, masterPetIdsJsonPath, newPetIdsCacheJsonPath) {
+function extractNewPetIds(inputPetIds, masterPetIdsJsonPath) {
   const currentPetIds = parsePetIdsJson(masterPetIdsJsonPath);
   const newPetIds = getNewPetIds(inputPetIds, currentPetIds);
-  writePetIdsToJson(newPetIds, newPetIdsCacheJsonPath);
   writePetIdsToJson([...currentPetIds, ...newPetIds], masterPetIdsJsonPath);
   return newPetIds;
 }

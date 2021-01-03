@@ -1,14 +1,9 @@
-const { execSync } = require('child_process');
+const fetch = require('node-fetch');
 
 const argv = require('./argv');
 const extractNewPetIds = require('./extract-new-pet-ids');
-const transformDbToPetIdsArray = require('./transform-db-to-pet-ids-array');
-const parsePetIdsJson = require('./parse-pet-ids-json');
 const notifyAboutPets = require('./notifications/notify-about-pets');
 
-const time = new Date().getTime();
-const dataParentPath = `./data/${time}`;
-const batchPetIdsJsonPath = `${dataParentPath}/pet-ids.json`;
 const { verbose } = argv;
 
 const petToPetBreedQueryParamMap = {
@@ -21,38 +16,35 @@ function getDataUrl() {
   return baseUrl + `?pet_breed=${petToPetBreedQueryParamMap[argv.pet]}`;
 }
 
-function fetchDataAndWriteToBatchPetIdsJson() {
-  const url = getDataUrl();
-  for (let pageIndex = 1; pageIndex <= argv.pagesCount; pageIndex++) {
-    const pageDirName = `page${pageIndex}`;
-    const dataPath = `${dataParentPath}/${pageDirName}`;
-    execSync(`mkdir -p ${dataPath}`);
-    const htmlFileName = `${dataPath}/index.html`;
-    const dbFileName = `${dataPath}/db`;
-    const fetchHtmlCmd = `wget -O "${htmlFileName}" "${url}&pet_page=${pageIndex}"`;
-    verbose && console.log(fetchHtmlCmd);
-    execSync(fetchHtmlCmd);
-    const saveIdsToDbCmd = `cat "${htmlFileName}" | grep -Eo '<a href="/pet/(\\d+)/">dowiedz' | grep -Eo '\\d+' | tee "${dbFileName}"`;
-    verbose && console.log(saveIdsToDbCmd);
-    execSync(saveIdsToDbCmd);
-    const newPetIds = extractNewPetIds(transformDbToPetIdsArray(dbFileName), batchPetIdsJsonPath, `${dataPath}/new-pet-ids.json`);
-    verbose && console.log('partial new pet ids', newPetIds);
-  }
+async function fetchHtml(url) {
+  const response = await fetch(url);
+  return response.text();
 }
 
-function maybeRemoveTemporaryData() {
-  if (!argv.preserveData) {
-    execSync('rm -rf data');
+function extractPetIds(html) {
+  return Array.from(html.matchAll(/<a href="\/pet\/(\d+)\/">dowiedz/g))
+    .map(rawIdMatch => rawIdMatch[0])
+    .map(rawId => rawId.match(/\d+/))
+    .map(idMatch => idMatch[0]);
+}
+
+async function fetchPetIds() {
+  const url = getDataUrl();
+  const allPetIds = [];
+  for (let pageIndex = 1; pageIndex <= argv.pagesCount; pageIndex++) {
+    const html = await fetchHtml(`${url}&pet_page=${pageIndex}`);
+    const petIds = extractPetIds(html);
+    allPetIds.push(...petIds);
   }
+  verbose && console.log('partial new pet ids', allPetIds);
+  return allPetIds;
 }
 
 async function crawl() {
-  fetchDataAndWriteToBatchPetIdsJson();
-  const newPetIds = extractNewPetIds(parsePetIdsJson(batchPetIdsJsonPath), `./pet-ids.json`);
+  const petIds = await fetchPetIds();
+  const newPetIds = extractNewPetIds(petIds, `./pet-ids.json`);
   verbose && console.log('all new pet ids', newPetIds);
   await notifyAboutPets(newPetIds);
-  maybeRemoveTemporaryData();
 }
 
-execSync(`mkdir -p ${dataParentPath}`);
 crawl();

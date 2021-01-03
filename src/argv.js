@@ -15,10 +15,6 @@ const { argv } = yargs(hideBin(process.argv))
     type: 'boolean',
     description: 'Run with verbose logging',
   })
-  .option('preserve-data', {
-    type: 'boolean',
-    description: 'Do not cleanup temporary data',
-  })
   .option('pages-count', {
     type: 'number',
     demandOption: true,
