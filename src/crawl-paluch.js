@@ -1,9 +1,10 @@
 const { execSync } = require('child_process');
+
+const argv = require('./argv');
 const extractNewPetIds = require('./extract-new-pet-ids');
 const transformDbToPetIdsArray = require('./transform-db-to-pet-ids-array');
 const parsePetIdsJson = require('./parse-pet-ids-json');
-const notifyAboutPets = require('./notify-about-pets');
-const argv = require('./argv');
+const notifyAboutPets = require('./notifications/notify-about-pets');
 
 const time = new Date().getTime();
 const dataParentPath = `./data/${time}`;
