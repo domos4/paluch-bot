@@ -1,1 +1,1 @@
-module.exports = "Łaf Łaf! 🐶 Kolejne psiaki do adopcji - zobacz najnowszych podopiecznych Palucha i znajdź przyjaciela na całe życie! 🐾";
+module.exports = "Łaf Łaf! 🐶 Kolejny psiak do adopcji - zobacz najnowszych podopiecznych Palucha i znajdź przyjaciela na całe życie! 🐾";
