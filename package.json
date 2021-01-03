@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/crawl-paluch.js",
   "scripts": {
-    "start": "yarn && source exec.sh"
+    "start": "yarn && . exec.sh"
   },
   "author": "",
   "license": "ISC",
