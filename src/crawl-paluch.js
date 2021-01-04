@@ -7,13 +7,13 @@ const notifyAboutPets = require('./notifications/notify-about-pets');
 const { verbose } = argv;
 
 const petToPetBreedQueryParamMap = {
-  dog: '-1',
-  cat: '-2',
+  dog: '1',
+  cat: '2',
 };
 
 function getDataUrl() {
   const baseUrl = 'https://napaluchu.waw.pl/zwierzeta/zwierzeta-do-adopcji/';
-  return baseUrl + `?pet_breed=${petToPetBreedQueryParamMap[argv.pet]}`;
+  return baseUrl + `?pet_species=${petToPetBreedQueryParamMap[argv.pet]}`;
 }
 
 async function fetchHtml(url) {
