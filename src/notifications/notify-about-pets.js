@@ -28,7 +28,7 @@ function maybeTweet(petId) {
     const errors = parsedTwitterResponse.errors;
     if (!errors) {
       verbose && console.log('tweet successful');
-      return;
+      return true;
     }
     if (errors.length === 1 && errors[0].code === 186) { // too long tweet
       console.error('tweet failed due to being too long');
@@ -37,6 +37,7 @@ function maybeTweet(petId) {
       console.error(errors);
     }
   }
+  return false;
 }
 
 async function notifyAboutPets(petIds) {
@@ -44,8 +45,14 @@ async function notifyAboutPets(petIds) {
     verbose && console.log('no pets to notify about. aborting.');
     return;
   }
-  petIds.forEach(maybeTweet);
+  const successfulNotifications = [];
+  petIds.forEach((petId) => {
+    const notifiedSuccessfully = maybeTweet(petId);
+    if (notifiedSuccessfully) {
+      successfulNotifications.push(petId);
+    }
+  });
+  return successfulNotifications;
 }
-
 
 module.exports = notifyAboutPets;

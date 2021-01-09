@@ -6,6 +6,8 @@
   "license": "ISC",
   "dependencies": {
     "node-fetch": "^2.6.1",
+    "pg": "^8.5.1",
+    "pg-format": "^1.0.4",
     "yargs": "^16.2.0"
   }
 }
