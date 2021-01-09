@@ -1,12 +1,8 @@
 {
   "name": "paluch-crawler",
   "version": "1.0.0",
-  "description": "",
   "main": "src/crawl-paluch.js",
-  "scripts": {
-    "start": "yarn && . ./exec.sh"
-  },
-  "author": "",
+  "author": "dominik chmielarz",
   "license": "ISC",
   "dependencies": {
     "node-fetch": "^2.6.1",
