@@ -13,6 +13,11 @@ async function queryAllPetIds() {
   return query.rows.map(row => row["pet_id"]);
 }
 
+async function queryUnnotifiedPetIds() {
+  const query = await client.query('SELECT "pet_id" FROM pets WHERE notified=FALSE;');
+  return query.rows.map(row => row["pet_id"]);
+}
+
 async function insertNewPetIds(petIds) {
   if (petIds.length === 0) {
     verbose && console.log('no pet ids to insert. terminating.');
@@ -42,6 +47,7 @@ function disconnect() {
 
 module.exports = {
   queryAllPetIds,
+  queryUnnotifiedPetIds,
   insertNewPetIds,
   setNotifiedTrueForGivenPetIds,
   disconnect,

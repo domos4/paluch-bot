@@ -11,7 +11,13 @@ const petToPetBreedQueryParamMap = {
   cat: '2',
 };
 
-const { queryAllPetIds, insertNewPetIds, setNotifiedTrueForGivenPetIds, disconnect } = require('./db');
+const {
+  queryAllPetIds,
+  queryUnnotifiedPetIds,
+  insertNewPetIds,
+  setNotifiedTrueForGivenPetIds,
+  disconnect,
+} = require('./db');
 
 function getDataUrl() {
   const baseUrl = 'https://napaluchu.waw.pl/zwierzeta/zwierzeta-do-adopcji/';
@@ -42,34 +48,32 @@ async function fetchPetIds() {
   return allPetIds;
 }
 
-async function saveNewPetsAndNotify() {
+async function getNewPetIds() {
   const [petIds, previousPetIds] = await Promise.all([fetchPetIds(), queryAllPetIds()]);
   const newPetIds = extractNewPetIds(petIds, previousPetIds);
   verbose && console.log('fetched pet ids', petIds);
   verbose && console.log('previous pet ids', previousPetIds);
   verbose && console.log('calculated new pet ids', newPetIds);
+  return newPetIds;
+}
+
+async function execute() {
+  const newPetIds = await getNewPetIds();
   await insertNewPetIds(newPetIds);
-  const successfulNotificationsPetIds = await notifyAboutPets(newPetIds);
+  const unnotifiedPetIds = await queryUnnotifiedPetIds();
+  const successfulNotificationsPetIds = await notifyAboutPets(unnotifiedPetIds);
   await setNotifiedTrueForGivenPetIds(successfulNotificationsPetIds);
   await disconnect();
 }
 
-async function executeWithVerbosity() {
+async function executeWithLogging() {
   verbose && console.log(`starting execution for pet="${pet}", pagesCount=${pagesCount}`);
   const startTime = new Date().getTime();
-  await saveNewPetsAndNotify();
+  await execute();
   const endTime = new Date().getTime();
   const timeSpent = endTime - startTime;
   verbose && console.log(`execution ended.`);
   verbose && console.log(`took ${timeSpent / 1000} seconds to execute.`);
 }
 
-async function execute() {
-  await saveNewPetsAndNotify();
-}
-
-if (verbose) {
-  executeWithVerbosity();
-} else {
-  execute();
-}
+executeWithLogging();
