@@ -42,7 +42,7 @@ async function fetchPetIds() {
   return allPetIds;
 }
 
-async function crawl() {
+async function saveNewPetsAndNotify() {
   const [petIds, previousPetIds] = await Promise.all([fetchPetIds(), queryAllPetIds()]);
   console.log('previousPetIds', previousPetIds);
   const newPetIds = extractNewPetIds(petIds, previousPetIds);
@@ -53,4 +53,4 @@ async function crawl() {
   disconnect();
 }
 
-crawl();
+saveNewPetsAndNotify();

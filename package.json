@@ -1,7 +1,6 @@
 {
   "name": "paluch-crawler",
   "version": "1.0.0",
-  "main": "src/crawl-paluch.js",
   "author": "dominik chmielarz",
   "license": "ISC",
   "dependencies": {
