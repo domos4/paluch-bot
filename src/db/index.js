@@ -23,6 +23,16 @@ async function insertNewPetIds(petIds) {
   await client.query(sql);
 }
 
+async function setNotifiedTrueForGivenPetIds(petIds) {
+  if (petIds.length === 0) {
+    verbose && console.log('no pet ids to set notified flags true. terminating.');
+    return;
+  }
+  const sql = format('UPDATE pets SET notified=TRUE WHERE "pet_id" IN (%L)', petIds);
+  verbose && console.log('setting notified to true sql:', sql);
+  await client.query(sql);
+}
+
 function disconnect() {
   client
     .end()
@@ -33,5 +43,6 @@ function disconnect() {
 module.exports = {
   queryAllPetIds,
   insertNewPetIds,
+  setNotifiedTrueForGivenPetIds,
   disconnect,
 };

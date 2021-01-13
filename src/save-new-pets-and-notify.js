@@ -11,7 +11,7 @@ const petToPetBreedQueryParamMap = {
   cat: '2',
 };
 
-const { queryAllPetIds, insertNewPetIds, disconnect } = require('./db');
+const { queryAllPetIds, insertNewPetIds, setNotifiedTrueForGivenPetIds, disconnect } = require('./db');
 
 function getDataUrl() {
   const baseUrl = 'https://napaluchu.waw.pl/zwierzeta/zwierzeta-do-adopcji/';
@@ -50,7 +50,7 @@ async function saveNewPetsAndNotify() {
   verbose && console.log('calculated new pet ids', newPetIds);
   await insertNewPetIds(newPetIds);
   const successfulNotificationsPetIds = await notifyAboutPets(newPetIds);
-  // TODO update db to preserve failed notifications data
+  await setNotifiedTrueForGivenPetIds(successfulNotificationsPetIds);
   await disconnect();
 }
 
