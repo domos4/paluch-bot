@@ -54,18 +54,22 @@ async function saveNewPetsAndNotify() {
   await disconnect();
 }
 
-async function execute() {
-  if (verbose) {
-    verbose && console.log(`starting execution for pet="${pet}", pagesCount=${pagesCount}`);
-    const startTime = new Date().getTime();
-    await saveNewPetsAndNotify();
-    const endTime = new Date().getTime();
-    const timeSpent = endTime - startTime;
-    verbose && console.log(`execution ended.`);
-    verbose && console.log(`took ${timeSpent / 1000} seconds to execute.`);
-  } else {
-    await saveNewPetsAndNotify();
-  }
+async function executeWithVerbosity() {
+  verbose && console.log(`starting execution for pet="${pet}", pagesCount=${pagesCount}`);
+  const startTime = new Date().getTime();
+  await saveNewPetsAndNotify();
+  const endTime = new Date().getTime();
+  const timeSpent = endTime - startTime;
+  verbose && console.log(`execution ended.`);
+  verbose && console.log(`took ${timeSpent / 1000} seconds to execute.`);
 }
 
-execute();
+async function execute() {
+  await saveNewPetsAndNotify();
+}
+
+if (verbose) {
+  executeWithVerbosity();
+} else {
+  execute();
+}
