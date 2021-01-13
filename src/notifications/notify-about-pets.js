@@ -42,7 +42,7 @@ function maybeTweet(petId) {
 
 async function notifyAboutPets(petIds) {
   if (petIds.length === 0) {
-    verbose && console.log('no pets to notify about. aborting.');
+    verbose && console.log('no pets to notify about. terminating.');
     return;
   }
   const successfulNotifications = [];
