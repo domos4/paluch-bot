@@ -5,6 +5,3 @@ CREATE TABLE pets
     "notified"  BOOLEAN     NOT NULL DEFAULT FALSE,
     "available" BOOLEAN     NOT NULL DEFAULT TRUE
 );
-
-
-truncate table pets;
